@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>REAKTR — Website Builder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800;900&family=JetBrains+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #080808;
+    --surface: #111111;
+    --border: #1e1e1e;
+    --accent: #ff3c00;
+    --accent2: #ffb800;
+    --text: #f0f0f0;
+    --muted: #555;
+    --green: #00e676;
+    --blue: #00b4ff;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Grid Background ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(255,60,0,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,60,0,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* ── Header ── */
+  header {
+    position: relative;
+    z-index: 10;
+    padding: 24px 32px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 900;
+    font-size: 22px;
+    letter-spacing: -1px;
+    color: var(--text);
+  }
+
+  .logo span {
+    color: var(--accent);
+  }
+
+  .badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 3px 8px;
+    background: rgba(255,60,0,0.12);
+    border: 1px solid rgba(255,60,0,0.3);
+    color: var(--accent);
+    border-radius: 4px;
+    letter-spacing: 1px;
+  }
+
+  .model-badge {
+    margin-left: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    background: rgba(0,180,255,0.08);
+    border: 1px solid rgba(0,180,255,0.2);
+    color: var(--blue);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--green);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.8); }
+  }
+
+  /* ── Main Layout ── */
+  main {
+    position: relative;
+    z-index: 1;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 32px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+  }
+
+  @media (max-width: 768px) {
+    main { grid-template-columns: 1fr; padding: 20px 16px; }
+    header { padding: 16px; }
+  }
+
+  /* ── Cards ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,60,0,0.4), transparent);
+  }
+
+  .card-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  /* ── Prompt Section ── */
+  .prompt-section {
+    grid-column: 1 / -1;
+  }
+
+  .prompt-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .prompt-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 900;
+    font-size: 32px;
+    letter-spacing: -1.5px;
+    line-height: 1;
+  }
+
+  .prompt-title em {
+    font-style: normal;
+    color: var(--accent);
+  }
+
+  .prompt-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 6px;
+    margin-bottom: 20px;
+  }
+
+  textarea {
+    width: 100%;
+    min-height: 120px;
+    background: #0d0d0d;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    padding: 16px;
+    resize: vertical;
+    outline: none;
+    transition: border-color 0.2s;
+    line-height: 1.6;
+  }
+
+  textarea:focus {
+    border-color: rgba(255,60,0,0.5);
+    box-shadow: 0 0 0 3px rgba(255,60,0,0.06);
+  }
+
+  textarea::placeholder { color: var(--muted); }
+
+  /* ── Options Row ── */
+  .options-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .field-group label {
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  input[type="text"], input[type="number"], select {
+    background: #0d0d0d;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    padding: 8px 12px;
+    outline: none;
+    transition: border-color 0.2s;
+    min-width: 120px;
+  }
+
+  input[type="number"] { width: 70px; }
+
+  input:focus, select:focus {
+    border-color: rgba(255,60,0,0.5);
+  }
+
+  select option { background: #111; }
+
+  /* ── Generate Button ── */
+  .btn-generate {
+    margin-left: auto;
+    padding: 12px 28px;
+    background: var(--accent);
+    color: #fff;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    letter-spacing: 0.5px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    white-space: nowrap;
+  }
+
+  .btn-generate:hover {
+    background: #ff5520;
+    transform: translateY(-1px);
+    box-shadow: 0 8px 24px rgba(255,60,0,0.3);
+  }
+
+  .btn-generate:disabled {
+    background: #2a2a2a;
+    color: var(--muted);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .btn-generate .icon { font-size: 16px; }
+
+  /* ── Log Terminal ── */
+  .log-section { grid-column: 1 / -1; }
+
+  .log-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+
+  .log-status {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    margin-left: auto;
+  }
+
+  .log-status.idle { background: rgba(85,85,85,0.2); color: var(--muted); border: 1px solid var(--border); }
+  .log-status.running { background: rgba(255,184,0,0.12); color: var(--accent2); border: 1px solid rgba(255,184,0,0.3); }
+  .log-status.done { background: rgba(0,230,118,0.1); color: var(--green); border: 1px solid rgba(0,230,118,0.3); }
+  .log-status.error { background: rgba(255,60,0,0.1); color: var(--accent); border: 1px solid rgba(255,60,0,0.3); }
+
+  .terminal {
+    background: #050505;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    min-height: 280px;
+    max-height: 400px;
+    overflow-y: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.7;
+    position: relative;
+  }
+
+  .terminal::-webkit-scrollbar { width: 4px; }
+  .terminal::-webkit-scrollbar-track { background: transparent; }
+  .terminal::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .log-line {
+    display: block;
+    color: #888;
+    animation: fadeIn 0.2s ease;
+  }
+
+  .log-line.info { color: #888; }
+  .log-line.success { color: var(--green); }
+  .log-line.warning { color: var(--accent2); }
+  .log-line.error { color: var(--accent); }
+  .log-line.headline { color: var(--text); font-weight: 500; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(2px); } to { opacity: 1; transform: translateY(0); } }
+
+  .terminal-empty {
+    color: var(--muted);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 240px;
+    gap: 8px;
+  }
+
+  .terminal-empty .icon { font-size: 32px; opacity: 0.3; }
+  .terminal-empty p { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; }
+
+  /* ── Files Section ── */
+  .files-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+    margin-top: 4px;
+  }
+
+  .file-card {
+    background: #0a0a0a;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--text);
+    transition: all 0.2s;
+    font-size: 13px;
+  }
+
+  .file-card:hover {
+    border-color: rgba(255,60,0,0.3);
+    background: rgba(255,60,0,0.04);
+    transform: translateY(-1px);
+  }
+
+  .file-icon {
+    width: 32px;
+    height: 32px;
+    background: rgba(0,180,255,0.1);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+
+  .file-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--blue);
+  }
+
+  .file-title { font-size: 11px; color: var(--muted); }
+
+  /* ── Stats Row ── */
+  .stats-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 0;
+  }
+
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .stat-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+
+  .stat-card.active::after { transform: scaleX(1); }
+
+  .stat-value {
+    font-family: 'Syne', sans-serif;
+    font-weight: 900;
+    font-size: 28px;
+    letter-spacing: -1px;
+    color: var(--text);
+  }
+
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 2px;
+  }
+
+  /* ── Deploy Banner ── */
+  #deploy-banner {
+    display: none;
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, rgba(0,230,118,0.06), rgba(0,180,255,0.06));
+    border: 1px solid rgba(0,230,118,0.2);
+    border-radius: 12px;
+    padding: 24px 28px;
+  }
+
+  .deploy-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    color: var(--green);
+    margin-bottom: 10px;
+  }
+
+  .deploy-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+    color: #aaa;
+    line-height: 1.6;
+  }
+
+  .deploy-steps span { color: var(--text); }
+  .deploy-steps code {
+    font-family: 'JetBrains Mono', monospace;
+    background: rgba(255,255,255,0.05);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--blue);
+  }
+
+  .repo-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    padding: 9px 18px;
+    background: rgba(0,230,118,0.1);
+    border: 1px solid rgba(0,230,118,0.25);
+    border-radius: 7px;
+    color: var(--green);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    text-decoration: none;
+    transition: all 0.2s;
+  }
+
+  .repo-link:hover {
+    background: rgba(0,230,118,0.15);
+    transform: translateY(-1px);
+  }
+
+  /* ── Spinner ── */
+  .spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,0.2);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">REAK<span>T</span>R</div>
+  <div class="badge">WEBSITE BUILDER</div>
+  <div class="model-badge">
+    <div class="dot"></div>
+    KIMI K2.5
+  </div>
+</header>
+
+<main>
+
+  <!-- Stats Row -->
+  <div style="grid-column: 1/-1;">
+    <div class="stats-row">
+      <div class="stat-card" id="stat-jobs">
+        <div class="stat-value" id="val-jobs">0</div>
+        <div class="stat-label">Jobs Run</div>
+      </div>
+      <div class="stat-card" id="stat-pages">
+        <div class="stat-value" id="val-pages">0</div>
+        <div class="stat-label">Pages Built</div>
+      </div>
+      <div class="stat-card" id="stat-repos">
+        <div class="stat-value" id="val-repos">0</div>
+        <div class="stat-label">Repos Created</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Prompt Card -->
+  <div class="card prompt-section">
+    <div class="prompt-title">Build a <em>website.</em></div>
+    <div class="prompt-sub">Describe what you want — Kimi K2.5 designs, builds, and uploads it to GitHub automatically.</div>
+
+    <textarea id="prompt" placeholder="A luxury watch brand called VERO. Dark aesthetic, editorial layout, 5 pages including home, collection, about, journal, and contact. High-end, bold typography, no stock images."></textarea>
+
+    <div class="options-row">
+      <div class="field-group">
+        <label>Repo Name</label>
+        <input type="text" id="repo-name" placeholder="my-site" maxlength="40" />
+      </div>
+      <div class="field-group">
+        <label>Pages</label>
+        <input type="number" id="page-count" value="5" min="1" max="10" />
+      </div>
+      <button class="btn-generate" id="btn-generate" onclick="startGeneration()">
+        <span class="icon">⚡</span> Generate Website
+      </button>
+    </div>
+  </div>
+
+  <!-- Log Terminal -->
+  <div class="card log-section">
+    <div class="log-header">
+      <div class="card-title" style="margin:0">Live Feed</div>
+      <div class="log-status idle" id="job-status">IDLE</div>
+    </div>
+    <div class="terminal" id="terminal">
+      <div class="terminal-empty" id="terminal-empty">
+        <div class="icon">⬡</div>
+        <p>Waiting for job...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Files -->
+  <div class="card" id="files-section" style="display:none; grid-column: 1/-1;">
+    <div class="card-title">Generated Files</div>
+    <div class="files-grid" id="files-grid"></div>
+  </div>
+
+  <!-- Deploy Banner -->
+  <div id="deploy-banner">
+    <div class="deploy-title">🎉 Website Ready to Deploy</div>
+    <div class="deploy-steps">
+      <div>1. <span>Go to</span> <code>pages.cloudflare.com</code> → Create Project → Connect to Git</div>
+      <div>2. <span>Search for your repo:</span> <code id="deploy-repo-name">your-repo</code></div>
+      <div>3. <span>Build command:</span> leave empty &nbsp;·&nbsp; <span>Output dir:</span> <code>/</code></div>
+      <div>4. Click <span>Deploy</span> — done. Your site goes live in ~30 seconds.</div>
+    </div>
+    <a href="#" id="repo-link" class="repo-link" target="_blank">
+      ↗ View on GitHub
+    </a>
+  </div>
+
+</main>
+
+<script>
+  // ── Config — REPLACE THIS WITH YOUR WORKER URL ──────────────
+  // After deploying your Worker, paste its URL here
+  // Example: https://website-builder-api.YOUR-SUBDOMAIN.workers.dev
+  const WORKER_URL = "PASTE_YOUR_WORKER_URL_HERE";
+  // ─────────────────────────────────────────────────────────────
+
+  let currentJobId = null;
+  let statsJobs = 0, statsPages = 0, statsRepos = 0;
+  let eventSource = null;
+
+  function setStatus(status) {
+    const el = document.getElementById("job-status");
+    el.className = "log-status " + status;
+    el.textContent = status.toUpperCase();
+  }
+
+  function addLog(message) {
+    const terminal = document.getElementById("terminal");
+    const empty = document.getElementById("terminal-empty");
+    if (empty) empty.remove();
+
+    const line = document.createElement("span");
+    line.className = "log-line";
+
+    if (message.includes("✓") || message.includes("🎉") || message.includes("Done")) {
+      line.className += " success";
+    } else if (message.includes("⚠") || message.includes("Warning")) {
+      line.className += " warning";
+    } else if (message.includes("❌") || message.includes("Error")) {
+      line.className += " error";
+    } else if (message.startsWith("\n")) {
+      line.className += " headline";
+    }
+
+    line.textContent = message;
+    terminal.appendChild(line);
+    terminal.scrollTop = terminal.scrollHeight;
+  }
+
+  function addFile(file) {
+    const section = document.getElementById("files-section");
+    const grid = document.getElementById("files-grid");
+    section.style.display = "block";
+
+    const a = document.createElement("a");
+    a.className = "file-card";
+    a.href = file.url;
+    a.target = "_blank";
+    a.innerHTML = `
+      <div class="file-icon">📄</div>
+      <div>
+        <div class="file-name">${file.filename}</div>
+        <div class="file-title">${file.title}</div>
+      </div>
+    `;
+    grid.appendChild(a);
+
+    statsPages++;
+    document.getElementById("val-pages").textContent = statsPages;
+    document.getElementById("stat-pages").classList.add("active");
+  }
+
+  async function startGeneration() {
+    const prompt = document.getElementById("prompt").value.trim();
+    if (!prompt) { alert("Please enter a prompt first."); return; }
+
+    if (WORKER_URL === "PASTE_YOUR_WORKER_URL_HERE") {
+      alert("⚠️ You need to paste your Worker URL into the WORKER_URL variable in this file first!\n\nSee the Setup Guide for instructions.");
+      return;
+    }
+
+    // Reset UI
+    const terminal = document.getElementById("terminal");
+    terminal.innerHTML = '';
+    document.getElementById("files-section").style.display = "none";
+    document.getElementById("files-grid").innerHTML = '';
+    document.getElementById("deploy-banner").style.display = "none";
+
+    const repoInput = document.getElementById("repo-name").value.trim();
+    const pages = parseInt(document.getElementById("page-count").value) || 5;
+    const repoName = repoInput || "site-" + Date.now();
+
+    const btn = document.getElementById("btn-generate");
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span> Generating...';
+
+    setStatus("running");
+    statsJobs++;
+    document.getElementById("val-jobs").textContent = statsJobs;
+
+    try {
+      const res = await fetch(`${WORKER_URL}/generate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ prompt, repoName, pages }),
+      });
+
+      const data = await res.json();
+      if (!data.jobId) throw new Error(data.error || "Failed to start job");
+
+      currentJobId = data.jobId;
+      statsRepos++;
+      document.getElementById("val-repos").textContent = statsRepos;
+      document.getElementById("stat-repos").classList.add("active");
+
+      // Start SSE stream
+      if (eventSource) eventSource.close();
+      eventSource = new EventSource(`${WORKER_URL}/stream/${currentJobId}`);
+
+      eventSource.onmessage = (e) => {
+        const msg = JSON.parse(e.data);
+
+        if (msg.type === "log") {
+          addLog(msg.message);
+        }
+
+        if (msg.type === "done") {
+          setStatus("done");
+          btn.disabled = false;
+          btn.innerHTML = '<span class="icon">⚡</span> Generate Website';
+          eventSource.close();
+
+          if (msg.files) msg.files.forEach(addFile);
+
+          // Show deploy banner
+          const banner = document.getElementById("deploy-banner");
+          const repoLink = document.getElementById("repo-link");
+          const deployRepoName = document.getElementById("deploy-repo-name");
+          banner.style.display = "block";
+          deployRepoName.textContent = msg.repo;
+          repoLink.href = `https://github.com/mohsen7778/${msg.repo}`;
+        }
+
+        if (msg.type === "error") {
+          addLog("❌ " + msg.message);
+          setStatus("error");
+          btn.disabled = false;
+          btn.innerHTML = '<span class="icon">⚡</span> Generate Website';
+          eventSource.close();
+        }
+      };
+
+      eventSource.onerror = () => {
+        // SSE disconnected — poll for status instead
+        eventSource.close();
+        pollStatus(currentJobId);
+      };
+
+    } catch (err) {
+      addLog("❌ " + err.message);
+      setStatus("error");
+      btn.disabled = false;
+      btn.innerHTML = '<span class="icon">⚡</span> Generate Website';
+    }
+  }
+
+  // Fallback polling if SSE disconnects (e.g. user reopens tab)
+  async function pollStatus(jobId) {
+    if (!jobId) return;
+    try {
+      const res = await fetch(`${WORKER_URL}/status/${jobId}`);
+      const data = await res.json();
+
+      data.logs?.forEach(addLog);
+
+      if (data.status === "done") {
+        setStatus("done");
+        document.getElementById("btn-generate").disabled = false;
+        document.getElementById("btn-generate").innerHTML = '<span class="icon">⚡</span> Generate Website';
+        if (data.files) data.files.forEach(addFile);
+
+        const banner = document.getElementById("deploy-banner");
+        banner.style.display = "block";
+        document.getElementById("deploy-repo-name").textContent = data.repo;
+        document.getElementById("repo-link").href = `https://github.com/mohsen7778/${data.repo}`;
+        return;
+      }
+
+      if (data.status === "error") {
+        setStatus("error");
+        document.getElementById("btn-generate").disabled = false;
+        document.getElementById("btn-generate").innerHTML = '<span class="icon">⚡</span> Generate Website';
+        return;
+      }
+
+      // Still running — poll again
+      setTimeout(() => pollStatus(jobId), 3000);
+    } catch (e) {
+      setTimeout(() => pollStatus(jobId), 5000);
+    }
+  }
+
+  // Auto-resume if page is reopened mid-job
+  const savedJob = sessionStorage.getItem("reaktr_job");
+  if (savedJob) {
+    currentJobId = savedJob;
+    addLog("Reconnecting to job: " + savedJob + "...");
+    setStatus("running");
+    pollStatus(savedJob);
+  }
+
+  document.getElementById("prompt").addEventListener("keydown", (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") startGeneration();
+  });
+</script>
+</body>
+</html>
